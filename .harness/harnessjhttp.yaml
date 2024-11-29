@@ -65,6 +65,16 @@ pipeline:
               - identifier: harnesslabk8sinfra
           execution:
             steps:
+              - step:
+                  type: K8sDelete
+                  name: K8sDelete_1
+                  identifier: K8sDelete_1
+                  spec:
+                    deleteResources:
+                      type: ReleaseName
+                      spec:
+                        deleteNamespace: true
+                  timeout: 10m
               - stepGroup:
                   name: Canary Deployment
                   identifier: canaryDeployment
