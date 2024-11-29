@@ -1,0 +1,32 @@
+template:
+  name: build-stage-template
+  type: Stage
+  spec:
+    type: CI
+    spec:
+      cloneCodebase: true
+      platform:
+        os: Linux
+        arch: Amd64
+      runtime:
+        type: Cloud
+        spec: {}
+      execution:
+        steps:
+          - step:
+              type: RunTests
+              name: run-test
+              identifier: runtest
+              spec:
+                language: Java
+                buildTool: Maven
+                args: clean test
+                runOnlySelectedTests: true
+                reports:
+                  type: JUnit
+                  spec:
+                    paths:
+                      - "**/*.xml"
+                enableTestSplitting: false
+  identifier: buildstagetemplate
+  versionLabel: V1
