@@ -41,3 +41,20 @@ pipeline:
                         paths:
                           - "**/*.xml"
                     enableTestSplitting: false
+              - step:
+                  type: Run
+                  name: build
+                  identifier: build
+                  spec:
+                    shell: Bash
+                    command: mvn -B package --file pom.xml
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: build-push-image
+                  identifier: buildpushimage
+                  spec:
+                    connectorRef: account.mshahatdockerhub
+                    repo: mshahat/harness-http
+                    tags:
+                      - latest
+                    caching: true
