@@ -1,0 +1,18 @@
+template:
+  name: run-java-test-step-template
+  type: Step
+  spec:
+    type: RunTests
+    spec:
+      language: Java
+      buildTool: Maven
+      args: clean test
+      runOnlySelectedTests: true
+      reports:
+        type: JUnit
+        spec:
+          paths:
+            - "**/*.xml"
+      enableTestSplitting: false
+  identifier: runjavateststeptemplate
+  versionLabel: V1
