@@ -26,7 +26,7 @@ pipeline:
                   identifier: build
                   spec:
                     connectorRef: account.mshahatdockerhub
-                    image: alpine:latest
+                    image: maven:latest
                     shell: Bash
                     command: mvn -B package --file pom.xml
               - step:
