@@ -49,6 +49,11 @@ pipeline:
                     tags:
                       - latest
                     caching: true
+          caching:
+            enabled: true
+            paths: []
+          buildIntelligence:
+            enabled: false
     - stage:
         name: deploy-jhttp
         identifier: deployjhttp
