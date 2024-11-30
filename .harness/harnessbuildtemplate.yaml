@@ -18,12 +18,6 @@ pipeline:
         type: CI
         spec:
           cloneCodebase: true
-          platform:
-            os: Linux
-            arch: Amd64
-          runtime:
-            type: Cloud
-            spec: {}
           execution:
             steps:
               - step:
@@ -31,6 +25,8 @@ pipeline:
                   name: run-test
                   identifier: runtest
                   spec:
+                    connectorRef: account.mshahatdockerhub
+                    image: alpine:latest
                     language: Java
                     buildTool: Maven
                     args: clean test
@@ -41,3 +37,16 @@ pipeline:
                         paths:
                           - "**/*.xml"
                     enableTestSplitting: false
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.kindharnesslabforbuild
+              namespace: harness-ci
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          caching:
+            enabled: true
+            paths: []
+          buildIntelligence:
+            enabled: false
