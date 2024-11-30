@@ -21,22 +21,11 @@ pipeline:
           execution:
             steps:
               - step:
-                  type: RunTests
                   name: run-test
                   identifier: runtest
-                  spec:
-                    connectorRef: account.mshahatdockerhub
-                    image: alpine:latest
-                    language: Java
-                    buildTool: Maven
-                    args: clean test
-                    runOnlySelectedTests: true
-                    reports:
-                      type: JUnit
-                      spec:
-                        paths:
-                          - "**/*.xml"
-                    enableTestSplitting: false
+                  template:
+                    templateRef: runjavateststeptemplate
+                    versionLabel: V1.1
           infrastructure:
             type: KubernetesDirect
             spec:
