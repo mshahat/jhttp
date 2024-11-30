@@ -21,12 +21,6 @@ pipeline:
           execution:
             steps:
               - step:
-                  name: run-tests-java-from-template
-                  identifier: runtestsjavafromtemplate
-                  template:
-                    templateRef: account.runjavateststeptemplate
-                    versionLabel: V1
-              - step:
                   type: Run
                   name: build
                   identifier: build
