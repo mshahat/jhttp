@@ -1,0 +1,119 @@
+pipeline:
+  projectIdentifier: githubharnessjhttp
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.mshahatgithub
+        repoName: jhttp
+        build: <+input>
+  stages:
+    - stage:
+        name: built-jhttp
+        identifier: builtjhttp
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  name: run-tests-java-from-template
+                  identifier: runtestsjavafromtemplate
+                  template:
+                    templateRef: account.runjavateststeptemplate
+                    versionLabel: V1
+              - step:
+                  type: Run
+                  name: build
+                  identifier: build
+                  spec:
+                    shell: Bash
+                    command: mvn -B package --file pom.xml
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: build-push-image
+                  identifier: buildpushimage
+                  spec:
+                    connectorRef: account.mshahatdockerhub
+                    repo: mshahat/harness-http
+                    tags:
+                      - latest
+                    caching: true
+    - stage:
+        name: deploy-jhttp
+        identifier: deployjhttp
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: servicejhttp
+          environment:
+            environmentRef: mshahatstaging
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: harnesslabk8sinfra
+          execution:
+            steps:
+              - stepGroup:
+                  name: Canary Deployment
+                  identifier: canaryDeployment
+                  steps:
+                    - step:
+                        name: Canary Deployment
+                        identifier: canaryDeployment
+                        type: K8sCanaryDeploy
+                        timeout: 10m
+                        spec:
+                          instanceSelection:
+                            type: Count
+                            spec:
+                              count: 1
+                          skipDryRun: false
+                    - step:
+                        name: Canary Delete
+                        identifier: canaryDelete
+                        type: K8sCanaryDelete
+                        timeout: 10m
+                        spec: {}
+              - stepGroup:
+                  name: Primary Deployment
+                  identifier: primaryDeployment
+                  steps:
+                    - step:
+                        name: Rolling Deployment
+                        identifier: rollingDeployment
+                        type: K8sRollingDeploy
+                        timeout: 10m
+                        spec:
+                          skipDryRun: false
+            rollbackSteps:
+              - step:
+                  name: Canary Delete
+                  identifier: rollbackCanaryDelete
+                  type: K8sCanaryDelete
+                  timeout: 10m
+                  spec: {}
+              - step:
+                  name: Rolling Rollback
+                  identifier: rollingRollback
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec: {}
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+  identifier: harnessjhttpbuildonk8s
+  name: harness-jhttp-build-on-k8s
