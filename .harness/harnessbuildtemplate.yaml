@@ -24,7 +24,7 @@ pipeline:
                   name: run-test
                   identifier: runtest
                   template:
-                    templateRef: runjavateststeptemplate
+                    templateRef: account.runjavateststeptemplate
                     versionLabel: V1.1
           infrastructure:
             type: KubernetesDirect
