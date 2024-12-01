@@ -1,0 +1,59 @@
+pipeline:
+  name: harness-jhttp-v1.0
+  identifier: harnessjhttpv10
+  projectIdentifier: githubharnessjhttp
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.mshahatgithub
+        repoName: jhttp
+        build: <+input>
+  stages:
+    - stage:
+        name: build-jhttp
+        identifier: buildjhttp
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+            paths: []
+          buildIntelligence:
+            enabled: false
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.kindharnesslabforbuild
+              namespace: harness-ci
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  name: run-java-test-from-template
+                  identifier: runjavatestfromtemplate
+                  template:
+                    templateRef: account.runjavateststeptemplate
+                    versionLabel: V1.1
+              - step:
+                  type: Run
+                  name: build-jhttp
+                  identifier: buildjhttp
+                  spec:
+                    connectorRef: account.mshahatdockerhub
+                    image: maven:latest
+                    shell: Bash
+                    command: mvn -B package --file pom.xml
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: build-and-push-image
+                  identifier: buildandpushimage
+                  spec:
+                    connectorRef: account.mshahatdockerhub
+                    repo: mshahat/harness-jhttp
+                    tags:
+                      - latest
