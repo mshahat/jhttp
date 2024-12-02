@@ -12,7 +12,7 @@ pipeline:
         build: <+input>
   stages:
     - stage:
-        name: built-jhttp
+        name: build-jhttp
         identifier: builtjhttp
         description: ""
         type: CI
